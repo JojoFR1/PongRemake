@@ -14,8 +14,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Set-up
+      - name: Set-up Premake
         run: .\premake5.exe gmake
+
+      - name: Update make
+        run: |
+          winget install GnuWin32.make
     
       - name: Build
         run: make config=${{ matrix.config }}
