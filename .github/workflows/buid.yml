@@ -18,8 +18,9 @@ jobs:
         run: .\premake5.exe gmake
 
       - name: Update make
-        run: |
-          winget install GnuWin32.make
+        uses: crazy-max/ghaction-chocolatey@v3
+        with:
+          install: make
     
       - name: Build
         run: make config=${{ matrix.config }}
