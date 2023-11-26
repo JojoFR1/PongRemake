@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set-up Premake
-        run: .\premake5.exe gmake
+        run: .\premake5.exe gmake2
 
       - name: Update make
         uses: crazy-max/ghaction-chocolatey@v3
