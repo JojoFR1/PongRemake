@@ -20,7 +20,7 @@ jobs:
       - name: Update make
         uses: crazy-max/ghaction-chocolatey@v3
         with:
-          install: make
+          args: install make
     
       - name: Build
         run: make config=${{ matrix.config }}
