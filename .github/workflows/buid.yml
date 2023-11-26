@@ -1,0 +1,27 @@
+name: Build Project
+
+on:
+    push:
+    workflow_dispatch:
+
+jobs:
+  buld:
+    strategy:
+      matrix:
+        config: [debug, release]
+    
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set-up
+        run: premake5 gmake
+    
+      - name: Build
+        run: make config=${{ matrix.config }}
+        
+      - name: Upload built EXE file
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.event.repository.name }}-${{ matrix.config }}
+          path: bin/${{ matrix.config }}-windows-x86_64/Pong.exe
