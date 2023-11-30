@@ -34,6 +34,10 @@ project "Pong"
         "libs/**"
     }
 
+    buildoptions {
+        "-std=gnu++17"
+    }
+
     filter "system:windows"
         cppdialect "C++17"
         staticruntime "on"
