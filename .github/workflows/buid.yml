@@ -8,7 +8,7 @@ jobs:
   build:
     strategy:
       matrix:
-        config: [debug, release]
+        config: [debug-static, release-static]
     
     runs-on: windows-latest
 
