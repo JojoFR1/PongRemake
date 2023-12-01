@@ -6,25 +6,30 @@ on:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        config: [debug-static, release-static]
-    
+    name: ${{matrix.config.name}} Build
     runs-on: windows-latest
 
+    strategy:
+      matrix:
+        config:
+        - { name: Debug Shared, flags: -DBUILD_SHARED_LIBS=TRUE -DCMAKE_BUILD_TYPE=Debug }
+        - { name: Debug Static, flags: -DBUILD_SHARED_LIBS=FALSE -DCMAKE_BUILD_TYPE=Debug }
+        - { name: Release Shared, flags: -DBUILD_SHARED_LIBS=TRUE -DCMAKE_BUILD_TYPE=Release }
+        - { name: Release Static, flags: -DBUILD_SHARED_LIBS=FALSE -DCMAKE_BUILD_TYPE=Release}
+    
     steps:
       - uses: actions/checkout@v4
-      - name: Set-up Premake
-        run: .\premake5.exe gmake
     
-      - name: Build
-        run: |
-          mkdir bin
-          mkdir bin-int
-          make config=${{ matrix.config }}
+      - name: Configure CMake
+        shell: bash
+        run: cmake -S . -B buid ${{matrix.config.flags}}
         
-      - name: Upload built EXE file
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ github.event.repository.name }}-${{ matrix.config }}
-          path: bin/${{ matrix.config }}-windows-x86_64/Pong.exe
+      - name: Build
+        shell: bash
+        run: cmake --build build
+        
+      # - name: Upload built EXE file
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: ${{ github.event.repository.name }}-${{ matrix.config }}
+      #     path: bin/${{ matrix.config }}-windows-x86_64/Pong.exe

@@ -1,6 +1,5 @@
 .vscode/
 bin/
-bin-int/
+build/
 
 Makefile
-*.make
