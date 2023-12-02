@@ -5,34 +5,45 @@
 #include "SFML/Network.hpp"
 #include <iostream>
 
+struct Ball : sf::CircleShape {
+    explicit Ball(float radius = 0) {
+        this->setRadius(radius);
+    }
+    float ballSpeedX = 150.f, ballSpeedY = 150.f;
+};
+
+struct Paddle : sf::RectangleShape {
+    explicit Paddle(const sf::Vector2f& size = sf::Vector2f(0, 0), const sf::Vector2f& pos = sf::Vector2f(0, 0)) {
+        this->setSize(size);
+        this->setPosition(pos);
+    };
+    float paddleSpeed = 400.f;
+    int score = 0;
+};
+
 int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "Pong Remake", sf::Style::Titlebar | sf::Style::Close);
     window.setFramerateLimit(60);
     sf::Event event;
     sf::Font font;
     if (!font.loadFromFile("src/bit5x3.ttf"));
-    sf::Vertex line[2];
+    sf::Clock deltaClock;
+    float deltaTime;
+    sf::Vertex lines[40];
 
-    line[0].position = { window.getSize().x / 2.f, 0.f};
-    line[1].position = { window.getSize().x / 2.f, (float) window.getSize().y};
+    for (int i=0; i < std::size(lines); i++) {
+        lines[i].position = { window.getSize().x / 2.f, lines[i - 1].position.y + 15.f};
+    }
 
-    float ballSpeedX = 2.5f;
-    float ballSpeedY = 2.5f;
-    float paddleSpeed = 5.f;
-
-    int scoreRight = 0;
-    sf::Text textRight(std::to_string(scoreRight), font, 90);
+    Paddle paddleRight({ 10.f, 100.f }, { 50.f - paddleRight.getSize().x / 2.f, window.getSize().y / 2.f - paddleRight.getSize().y / 2.f});
+    sf::Text textRight(std::to_string(paddleRight.score), font, 90);
     textRight.setPosition({ window.getSize().x - window.getSize().x / 4.f - 45.f, 50.f});
-    sf::RectangleShape paddleRight({ 10.f, 100.f });
-    paddleRight.setPosition({ 50.f - paddleRight.getSize().x / 2.f, window.getSize().y / 2.f - paddleRight.getSize().y / 2.f});
 
-    int scoreLeft = 0;
-    sf::Text textLeft(std::to_string(scoreLeft), font, 90);
+    Paddle paddleLeft({ 10.f, 100.f }, { window.getSize().x - 50.f + paddleLeft.getSize().x / 2.f, window.getSize().y / 2.f - paddleLeft.getSize().y / 2.f});
+    sf::Text textLeft(std::to_string(paddleLeft.score), font, 90);
     textLeft.setPosition({ window.getSize().x / 4.f - 45.f, 50.f});
-    sf::RectangleShape paddleLeft({ 10.f, 100.f });
-    paddleLeft.setPosition({ window.getSize().x - 50.f + paddleLeft.getSize().x / 2.f, window.getSize().y / 2.f - paddleLeft.getSize().y / 2.f});
 
-    sf::CircleShape ball(5.f);
+    Ball ball(5.f);
     ball.setPosition({ window.getSize().x / 2.f, window.getSize().y / 2.f});
 
     sf::Text winnerText("", font, 60);
@@ -49,68 +60,62 @@ int main() {
                 window.close();
         }
 
-        if (paddleRight.getPosition().y < 25.f) {
-            paddleRight.setPosition({ paddleRight.getPosition().x, 25.f });
-            paddleSpeed = 5.f;
-        }
-        else if (paddleRight.getPosition().y + paddleRight.getSize().y > window.getSize().y - 25.f) {
-            paddleRight.setPosition({ paddleRight.getPosition().x, window.getSize().y - paddleRight.getSize().y - 25.f});
-            paddleSpeed = 5.f;
-        } else paddleSpeed = 5.f;
+        deltaTime = deltaClock.restart().asSeconds();
 
-        if (paddleLeft.getPosition().y < 25.f) {
+        if (paddleRight.getPosition().y < 25.f)
+            paddleRight.setPosition({ paddleRight.getPosition().x, 25.f });
+        else if (paddleRight.getPosition().y + paddleRight.getSize().y > window.getSize().y - 25.f)
+            paddleRight.setPosition({ paddleRight.getPosition().x, window.getSize().y - paddleRight.getSize().y - 25.f});
+
+        if (paddleLeft.getPosition().y < 25.f)
             paddleLeft.setPosition({ paddleLeft.getPosition().x, 25.f });
-            paddleSpeed = 5.f;
-        }
-        else if (paddleLeft.getPosition().y + paddleLeft.getSize().y > window.getSize().y - 25.f) {
+        else if (paddleLeft.getPosition().y + paddleLeft.getSize().y > window.getSize().y - 25.f)
             paddleLeft.setPosition({ paddleLeft.getPosition().x, window.getSize().y - paddleLeft.getSize().y - 25.f});
-            paddleSpeed = 5.f;
-        } else paddleSpeed = 5.f;
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::W))
-            paddleRight.move(sf::Vector2f(0.f, -1.f) * paddleSpeed);
+            paddleRight.move(sf::Vector2f(0.f, -1.f) * paddleRight.paddleSpeed * deltaTime);
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::S))
-            paddleRight.move(sf::Vector2f(0.f, 1.f) * paddleSpeed);
+            paddleRight.move(sf::Vector2f(0.f, 1.f) * paddleRight.paddleSpeed * deltaTime);
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Up))
-            paddleLeft.move(sf::Vector2f(0.f, -1.f) * paddleSpeed);
+            paddleLeft.move(sf::Vector2f(0.f, -1.f) * paddleLeft.paddleSpeed * deltaTime);
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Down))
-            paddleLeft.move(sf::Vector2f(0.f, 1.f) * paddleSpeed);
+            paddleLeft.move(sf::Vector2f(0.f, 1.f) * paddleLeft.paddleSpeed * deltaTime);
 
         if (ball.getGlobalBounds().intersects(paddleRight.getGlobalBounds()) ||
             ball.getGlobalBounds().intersects(paddleLeft.getGlobalBounds()))
-            ballSpeedX *= -1.1f;
+            ball.ballSpeedX *= -1.1f;
         
         if (ball.getPosition().y < 0.f)
-            ballSpeedY *= -1.1f;
-        if (ball.getPosition().y + ball.getRadius() >= window.getSize().y)
-            ballSpeedY *= -1.1f;
+            ball.ballSpeedY *= -1.1f;
+        if (ball.getPosition().y >= window.getSize().y)
+            ball.ballSpeedY *= -1.1f;
 
         if (ball.getPosition().x < 0.f) {
-            scoreRight += 1;
-            textRight.setString(std::to_string(scoreRight));
+            paddleRight.score += 1;
+            textRight.setString(std::to_string(paddleRight.score));
             winnerText.setString("Player Right Wins!");
-            ball.setPosition({ 0.f, -5.f});
-            ballSpeedX = ballSpeedY = 0.f;
+            ball.setPosition({ 0.f, -10.f});
+            ball.ballSpeedX = ball.ballSpeedY = 0.f;
         }
         if (ball.getPosition().x > window.getSize().x) {
-            scoreLeft += 1;
-            textLeft.setString(std::to_string(scoreLeft));
+            paddleLeft.score += 1;
+            textLeft.setString(std::to_string(paddleLeft.score));
             winnerText.setString("Player Left Wins!");
-            ball.setPosition({ 0.f, -5.f});
-            ballSpeedX = ballSpeedY = 0.f;
+            ball.setPosition({ 0.f, -10.f});
+            ball.ballSpeedX = ball.ballSpeedY = 0.f;
         }
         if (winnerText.getString().getSize() > 0 && sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
             winnerText.setString("");
             ball.setPosition({ window.getSize().x / 2.f, window.getSize().y / 2.f});
-            ballSpeedX = ballSpeedY = 2.5f;
+            ball.ballSpeedX = ball.ballSpeedY = 200.f;
         }
         
-        ball.move(sf::Vector2f(1.f * ballSpeedX, 1.f * ballSpeedY));
+        ball.move(sf::Vector2f(1.f * ball.ballSpeedX, 1.f * ball.ballSpeedY) * deltaTime);
     
         window.clear();
 
-        window.draw(line, 2, sf::Lines);
+        window.draw(lines, std::size(lines), sf::Lines);
         window.draw(ball);
         window.draw(paddleRight);
         window.draw(paddleLeft);
