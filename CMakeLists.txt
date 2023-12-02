@@ -14,8 +14,18 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(SFML)
 
 add_executable(PongRemake src/main.cpp)
-target_link_libraries(PongRemake PRIVATE sfml-graphics)
-target_link_libraries(PongRemake PRIVATE sfml-window)
-target_link_libraries(PongRemake PRIVATE sfml-system)
-target_link_libraries(PongRemake PRIVATE sfml-audio)
-target_link_libraries(PongRemake PRIVATE sfml-network)
+target_link_libraries(
+    PongRemake PRIVATE 
+    sfml-graphics sfml-window 
+    sfml-system sfml-audio sfml-network
+)
+
+if(WIN32)
+    add_custom_command(
+        TARGET PongRemake
+        COMMENT "Copy OpenAL DLL"
+        PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll $<TARGET_FILE_DIR:PongRemake>
+        VERBATIM
+    )
+endif()
+install(TARGETS PongRemake)

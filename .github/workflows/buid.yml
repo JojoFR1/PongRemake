@@ -6,11 +6,17 @@ on:
 
 jobs:
   build:
-    name: ${{matrix.config.name}} Build
-    runs-on: windows-latest
+    name: ${{matrix.platform.name}} ${{matrix.config.name}}
+    runs-on: ${{matrix.platform.name}}
 
     strategy:
       matrix:
+        platform:
+        - { name: Windows VS2019, os: windows-2019  }
+        - { name: Windows VS2022, os: windows-2022  }
+        - { name: Linux GCC,      os: ubuntu-latest }
+        - { name: Linux Clang,    os: ubuntu-latest, flags: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ }
+        - { name: macOS,          os: macos-latest  }
         config:
         - { name: Debug Shared, flags: -DBUILD_SHARED_LIBS=TRUE -DCMAKE_BUILD_TYPE=Debug }
         - { name: Debug Static, flags: -DBUILD_SHARED_LIBS=FALSE -DCMAKE_BUILD_TYPE=Debug }
@@ -18,11 +24,15 @@ jobs:
         - { name: Release Static, flags: -DBUILD_SHARED_LIBS=FALSE -DCMAKE_BUILD_TYPE=Release}
     
     steps:
+      - name: Install Linux Dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev
+
       - uses: actions/checkout@v4
     
       - name: Configure CMake
         shell: bash
-        run: cmake -S . -B buid ${{matrix.config.flags}}
+        run: cmake -S . -B buid ${{matrix.platform.flags}} ${{matrix.config.flags}}
         
       - name: Build
         shell: bash
