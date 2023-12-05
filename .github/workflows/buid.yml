@@ -10,6 +10,7 @@ jobs:
     runs-on: ${{matrix.platform.os}}
 
     strategy:
+      fail-fast: false
       matrix:
         platform:
         - { name: Windows VS2019, os: windows-2019  }
