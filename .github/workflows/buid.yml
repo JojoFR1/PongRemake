@@ -7,7 +7,7 @@ on:
 jobs:
   build:
     name: ${{matrix.platform.name}} ${{matrix.config.name}}
-    runs-on: ${{matrix.platform.name}}
+    runs-on: ${{matrix.platform.os}
 
     strategy:
       matrix:
