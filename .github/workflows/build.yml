@@ -26,7 +26,11 @@ jobs:
       - name: Install Linux Dependencies
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev
-
+      
+      - name: Install Windows MinGW
+        if: matrix.platform.name == "Windows GCC"
+        uses: egor-tensin/setup-mingw@v2.2.0
+      
       - uses: actions/checkout@v4
     
       - name: Configure CMake
