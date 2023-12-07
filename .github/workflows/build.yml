@@ -1,0 +1,44 @@
+name: Build Project
+
+on:
+    push:
+    workflow_dispatch:
+
+jobs:
+  build:
+    name: ${{matrix.platform.name}} ${{matrix.config.name}}
+    runs-on: ${{matrix.platform.os}}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+        - { name: Windows GCC,    os: windows-latest, flags: -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++  }
+        - { name: Windows VS2022, os: windows-2022  }
+        - { name: Linux GCC,      os: ubuntu-latest }
+        - { name: Linux Clang,    os: ubuntu-latest, flags: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ }
+        - { name: macOS,          os: macos-latest  }
+        config:
+        - { name: Shared, flags: -DBUILD_SHARED_LIBS=TRUE }
+        - { name: Static, flags: -DBUILD_SHARED_LIBS=FALSE}
+    
+    steps:
+      - name: Install Linux Dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev
+
+      - uses: actions/checkout@v4
+    
+      - name: Configure CMake
+        shell: bash
+        run: cmake -S . -B build ${{matrix.platform.flags}} ${{matrix.config.flags}}
+        
+      - name: Build
+        shell: bash
+        run: cmake --build build
+        
+      # - name: Upload built EXE file
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: ${{ github.event.repository.name }}-${{ matrix.config }}
+      #     path: bin/${{ matrix.config }}-windows-x86_64/Pong.exe
