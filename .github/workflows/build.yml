@@ -36,8 +36,8 @@ jobs:
         shell: bash
         run: python build.py build ${{matrix.config}} && python build.py build ${{matrix.config}} Shared
         
-      # - name: Upload built EXE file
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: ${{ github.event.repository.name }}-${{ matrix.config }}
-      #     path: bin/${{ matrix.config }}-windows-x86_64/Pong.exe
+      - name: Upload built EXE file
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.event.repository.name }}-${{ matrix.config }}
+          path: bin/Static-${{ matrix.config }}/PongRemake.exe

@@ -35,11 +35,13 @@ int main() {
         lines[i].position = { window.getSize().x / 2.f, lines[i - 1].position.y + 15.f};
     }
 
-    Paddle paddleRight({ 10.f, 100.f }, { 50.f - paddleRight.getSize().x / 2.f, window.getSize().y / 2.f - paddleRight.getSize().y / 2.f});
+    Paddle paddleRight({ 10.f, 100.f }, { 0.0f, 0.0f });
+    paddleRight.setPosition({ 50.f - paddleRight.getSize().x / 2.f, window.getSize().y / 2.f - paddleRight.getSize().y / 2.f});
     sf::Text textRight(std::to_string(paddleRight.score), font, 90);
     textRight.setPosition({ window.getSize().x - window.getSize().x / 4.f - 45.f, 50.f});
 
-    Paddle paddleLeft({ 10.f, 100.f }, { window.getSize().x - 50.f + paddleLeft.getSize().x / 2.f, window.getSize().y / 2.f - paddleLeft.getSize().y / 2.f});
+    Paddle paddleLeft({ 10.f, 100.f }, { 0.0f, 0.0f });
+    paddleLeft.setPosition({ window.getSize().x - 50.f + paddleLeft.getSize().x / 2.f, window.getSize().y / 2.f - paddleLeft.getSize().y / 2.f});
     sf::Text textLeft(std::to_string(paddleLeft.score), font, 90);
     textLeft.setPosition({ window.getSize().x / 4.f - 45.f, 50.f});
 
