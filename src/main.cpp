@@ -26,7 +26,7 @@ int main() {
     window.setFramerateLimit(60);
     sf::Event event;
     sf::Font font;
-    if (!font.loadFromFile("src/bit5x3.ttf"));
+    if (!font.loadFromFile("assets/bit5x3.ttf"));
     sf::Clock deltaClock;
     float deltaTime;
     sf::Vertex lines[40];

@@ -15,26 +15,26 @@ jobs:
         platform:
         - { name: Windows VS2022, os: windows-2022  }
         - { name: Linux GCC,      os: ubuntu-latest }
-        - { name: Linux Clang,    os: ubuntu-latest, flags: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ }
+        # Doesn't support flags
+        # - { name: Linux Clang,    os: ubuntu-latest, flags: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ }
         - { name: macOS,          os: macos-latest  }
-        config:
-        - { name: Shared, flags: -DBUILD_SHARED_LIBS=TRUE }
-        - { name: Static, flags: -DBUILD_SHARED_LIBS=FALSE}
-    
+        config: [Debug, Debug Shared, Release, Release Shared]
+
     steps:
       - name: Install Linux Dependencies
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev
       
       - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
     
-      - name: Configure CMake
+      - name: Build Project
         shell: bash
-        run: cmake -S . -B build ${{matrix.platform.flags}} ${{matrix.config.flags}}
-        
-      - name: Build
-        shell: bash
-        run: cmake --build build
+        run: python build.py build ${{matrix.config}}
         
       # - name: Upload built EXE file
       #   uses: actions/upload-artifact@v3
