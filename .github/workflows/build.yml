@@ -34,7 +34,7 @@ jobs:
     
       - name: Build Static Project
         shell: bash
-        run: python build.py build ${{matrix.config}} && python build.py build ${{matrix.config}} Shared
+        run: python build.py build ${{matrix.config}}
         
       - name: Build Shared Project
         shell: bash
