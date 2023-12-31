@@ -17,12 +17,9 @@ endif()
 set_property(GLOBAL PROPERTY CXX_STANDARD 17)
 set_property(GLOBAL PROPERTY CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-# Set the output directory for the lib (GLAD) and executable file
+# Set the output directory for the lib(s) and executable file
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${LIB_TYPE}-$<CONFIG>)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${LIB_TYPE}-$<CONFIG>)
-
-# Precompiled header file location
-# set(PRECOMPILED_HEADER "src/pch.h")
 
 # All .cpp and .h files location
 file(GLOB_RECURSE SOURCE_FILES "src/*.cpp")
@@ -39,23 +36,21 @@ FetchContent_MakeAvailable(SFML)
 # Libraries to link against
 set(LIBS sfml-graphics sfml-window sfml-system sfml-audio sfml-network)
 
+# Define the include directory
+include_directories("${CMAKE_SOURCE_DIR}/src")
+
 # Define the executable
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES})
 
-# Speicfy the precompiled header for this project
-target_precompile_headers(${PROJECT_NAME} PRIVATE ${PRECOMPILED_HEADER})
-
-# Define the include directory
-include_directories("${CMAKE_SOURCE_DIR}/src")
- 
 # Link the libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBS})
 
-# Make it so the console doesn't open if not in Debug
+# Make it so the console doesn't open if not in Debug in Windows
 if(WIN32 AND NOT ${CMAKE_BUILD_TYPE} MATCHES "Debug")
     target_link_options(${PROJECT_NAME} PRIVATE "-mwindow")
 endif()
 
+# Copy the OpenAL.dll on Windows. Required by SFML.
 if(WIN32)
     add_custom_command(
         TARGET ${PROJECT_NAME}
@@ -65,6 +60,7 @@ if(WIN32)
     )
 endif()
 
+# Copy the assets folder next to the executable file
 add_custom_command(
     TARGET ${PROJECT_NAME}
     COMMENT "Copy assets folder"
