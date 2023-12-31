@@ -20,8 +20,6 @@ set_property(GLOBAL PROPERTY CXX_STANDARD_REQUIRED ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${LIB_TYPE}-$<CONFIG>)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${LIB_TYPE}-$<CONFIG>)
 
-set(TYPE_WINDOW "-mwindows")
-
 # Precompiled header file location
 # set(PRECOMPILED_HEADER "src/pch.h")
 
@@ -53,8 +51,8 @@ include_directories("${CMAKE_SOURCE_DIR}/src")
 target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBS})
 
 # Make it so the console doesn't open if not in Debug
-if(NOT ${CMAKE_BUILD_TYPE} MATCHES "Debug")
-    target_link_options(${PROJECT_NAME} PRIVATE ${TYPE_WINDOW})
+if(WIN32 AND NOT ${CMAKE_BUILD_TYPE} MATCHES "Debug")
+    target_link_options(${PROJECT_NAME} PRIVATE "-mwindow")
 endif()
 
 if(WIN32)
