@@ -32,9 +32,13 @@ jobs:
         with:
           python-version: '3.11'
     
-      - name: Build Project
+      - name: Build Static Project
         shell: bash
         run: python build.py build ${{matrix.config}} && python build.py build ${{matrix.config}} Shared
+        
+      - name: Build Shared Project
+        shell: bash
+        run: python build.py build ${{matrix.config}} Shared
         
       - name: Upload built EXE file
         uses: actions/upload-artifact@v3
